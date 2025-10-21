@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { router } from 'expo-router';
 import { AuthenticationService } from '@/services';
 import { AuthState } from '@/types';
-import { COLORS } from '@/constants';
+import { COLORS, FONT_SIZES, SPACING } from '@/constants';
 
 export default function IndexScreen() {
   const [authState, setAuthState] = useState<AuthState | null>(null);
@@ -25,15 +25,21 @@ export default function IndexScreen() {
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      // Always show landing screen first, let user choose setup or login
-      router.replace('/landing');
+    if (!loading && authState) {
+      if (authState.isFirstLaunch) {
+        // No master password exists - new user
+        router.replace('/landing');
+      } else {
+        // Master password exists - existing user
+        router.replace('/auth/login');
+      }
     }
-  }, [loading]);
+  }, [loading, authState]);
 
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color={COLORS.primary} />
+      <Text style={styles.loadingText}>Checking authentication...</Text>
     </View>
   );
 }
@@ -44,5 +50,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.background,
+  },
+  loadingText: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.md,
+    textAlign: 'center',
   },
 });

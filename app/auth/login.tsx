@@ -6,6 +6,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -102,11 +103,26 @@ export default function LoginScreen() {
     return 'Use Biometric';
   };
 
+  const handleHomePress = () => {
+    router.push('/landing');
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Home Button */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          style={styles.homeButton}
+          onPress={handleHomePress}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="home" size={24} color={COLORS.primary} />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.iconContainer}>
@@ -182,6 +198,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundSecondary,
+  },
+  headerContainer: {
+    paddingTop: SPACING.xl + SPACING.lg,
+    paddingHorizontal: SPACING.md,
+    paddingBottom: SPACING.sm,
+    alignItems: 'flex-start',
+  },
+  homeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   content: {
     flex: 1,
