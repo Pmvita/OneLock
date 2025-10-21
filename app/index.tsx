@@ -26,15 +26,10 @@ export default function IndexScreen() {
 
   useEffect(() => {
     if (!loading) {
-      if (authState?.isFirstLaunch) {
-        router.replace('/auth/setup');
-      } else if (authState && !authState.isFirstLaunch) {
-        router.replace('/(tabs)');
-      } else if (!authState) {
-        router.replace('/auth' as any);
-      }
+      // Always show landing screen first, let user choose setup or login
+      router.replace('/landing');
     }
-  }, [loading, authState]);
+  }, [loading]);
 
   return (
     <View style={styles.container}>

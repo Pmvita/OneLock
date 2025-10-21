@@ -11,21 +11,38 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthenticationService } from '@/services';
+import { PasswordDataService } from '@/services/storage';
 import { PasswordValidator } from '@/utils';
+import { getTemplatePasswords } from '@/utils/templates';
 import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { Button, Input, Card, StrengthMeter } from '@/components';
 
 export default function SetupScreen() {
+  const [username, setUsername] = useState('');
   const [masterPassword, setMasterPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loadTemplates, setLoadTemplates] = useState(true);
 
   const passwordValidation = PasswordValidator.validateMasterPassword(masterPassword);
   const passwordsMatch = masterPassword === confirmPassword && confirmPassword.length > 0;
+  
+  // Username validation
+  const isUsernameValid = username.trim().length >= 3 && username.trim().length <= 20 && /^[a-zA-Z0-9_]+$/.test(username.trim());
 
   const handleSetup = async () => {
+    if (!username.trim()) {
+      Alert.alert('Username Required', 'Please enter a username.');
+      return;
+    }
+
+    if (!isUsernameValid) {
+      Alert.alert('Invalid Username', 'Username must be 3-20 characters long and contain only letters, numbers, and underscores.');
+      return;
+    }
+
     if (!passwordValidation.isValid) {
       Alert.alert('Invalid Password', passwordValidation.errors.join('\n'));
       return;
@@ -38,7 +55,14 @@ export default function SetupScreen() {
 
     setLoading(true);
     try {
-      await AuthenticationService.setupMasterPassword(masterPassword);
+      await AuthenticationService.setupMasterPassword(username.trim(), masterPassword);
+      
+      // Load template passwords if user chose to
+      if (loadTemplates) {
+        const templatePasswords = getTemplatePasswords();
+        await PasswordDataService.savePasswords(templatePasswords);
+      }
+      
       router.replace('/(tabs)');
     } catch (error) {
       Alert.alert('Setup Failed', 'Unable to set up master password. Please try again.');
@@ -68,6 +92,20 @@ export default function SetupScreen() {
         </View>
 
         <Card style={styles.formCard}>
+          <Text style={styles.sectionTitle}>Account Setup</Text>
+          <Text style={styles.sectionDescription}>
+            Choose a username for your OneLock account. This will be displayed on your login screen.
+          </Text>
+
+          <Input
+            label="Username"
+            placeholder="Enter your username"
+            value={username}
+            onChangeText={setUsername}
+            error={username.length > 0 && !isUsernameValid ? 'Username must be 3-20 characters long and contain only letters, numbers, and underscores' : undefined}
+            style={styles.input}
+          />
+
           <Text style={styles.sectionTitle}>Master Password</Text>
           <Text style={styles.sectionDescription}>
             This password will be used to encrypt and decrypt your stored passwords.
@@ -125,6 +163,35 @@ export default function SetupScreen() {
           </View>
         </Card>
 
+        <Card style={styles.templateCard}>
+          <View style={styles.templateHeader}>
+            <Ionicons name="document-text" size={24} color={COLORS.accent} />
+            <Text style={styles.templateTitle}>Get Started</Text>
+          </View>
+          
+          <Text style={styles.templateDescription}>
+            Would you like to start with sample passwords to see how OneLock works? 
+            You can always delete or edit these later.
+          </Text>
+          
+          <View style={styles.templateOptions}>
+            <Button
+              title="Yes, load sample passwords"
+              variant={loadTemplates ? "primary" : "outline"}
+              onPress={() => setLoadTemplates(true)}
+              icon="checkmark-circle"
+              style={styles.templateButton}
+            />
+            <Button
+              title="No, start with empty vault"
+              variant={!loadTemplates ? "primary" : "outline"}
+              onPress={() => setLoadTemplates(false)}
+              icon="close-circle"
+              style={styles.templateButton}
+            />
+          </View>
+        </Card>
+
         <Card style={styles.securityCard}>
           <View style={styles.securityHeader}>
             <Ionicons name="lock-closed" size={24} color={COLORS.accent} />
@@ -156,7 +223,7 @@ export default function SetupScreen() {
             title="Set Up OneLock"
             onPress={handleSetup}
             loading={loading}
-            disabled={!passwordValidation.isValid || !passwordsMatch}
+            disabled={!isUsernameValid || !passwordValidation.isValid || !passwordsMatch}
             icon="arrow-forward"
             gradient={true}
             style={styles.setupButton}
@@ -232,6 +299,32 @@ const styles = StyleSheet.create({
   passwordToggle: {
     alignItems: 'flex-end',
     marginBottom: SPACING.md,
+  },
+  templateCard: {
+    marginBottom: SPACING.lg,
+  },
+  templateHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  templateTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: FONT_WEIGHTS.semibold,
+    color: COLORS.textPrimary,
+    marginLeft: SPACING.sm,
+  },
+  templateDescription: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+    marginBottom: SPACING.lg,
+  },
+  templateOptions: {
+    gap: SPACING.sm,
+  },
+  templateButton: {
+    width: '100%',
   },
   securityCard: {
     marginBottom: SPACING.xl,

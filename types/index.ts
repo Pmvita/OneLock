@@ -33,6 +33,7 @@ export interface BreachCheckResult {
 }
 
 export interface UserSettings {
+  username?: string;
   masterPasswordHash?: string;
   biometricEnabled: boolean;
   autoLockMinutes: number;
@@ -42,6 +43,7 @@ export interface UserSettings {
 export interface AuthState {
   isAuthenticated: boolean;
   isFirstLaunch: boolean;
+  username?: string;
   biometricAvailable: boolean;
   biometricEnabled: boolean;
 }

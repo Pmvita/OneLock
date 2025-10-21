@@ -1,6 +1,9 @@
 import { PasswordStrength, PasswordGeneratorOptions, PasswordCategory } from '@/types';
 import { PASSWORD_STRENGTH_COLORS } from '@/constants';
 
+// Export template utilities
+export { getTemplatePasswords, isTemplatePassword, TEMPLATE_PASSWORDS } from './templates';
+
 /**
  * Password Generator Utility
  * Generates secure passwords based on user preferences

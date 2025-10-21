@@ -179,6 +179,7 @@ export const PASSWORD_GENERATOR_DEFAULTS = {
 };
 
 export const STORAGE_KEYS = {
+  USERNAME: 'username',
   MASTER_PASSWORD_HASH: 'master_password_hash',
   BIOMETRIC_ENABLED: 'biometric_enabled',
   AUTO_LOCK_MINUTES: 'auto_lock_minutes',

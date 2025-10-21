@@ -14,6 +14,7 @@ import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/cons
 import { Button, Input, Card } from '@/components';
 
 export default function LoginScreen() {
+  const [username, setUsername] = useState<string | null>(null);
   const [masterPassword, setMasterPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
@@ -23,7 +24,17 @@ export default function LoginScreen() {
 
   useEffect(() => {
     checkBiometricAvailability();
+    loadUsername();
   }, []);
+
+  const loadUsername = async () => {
+    try {
+      const storedUsername = await AuthenticationService.getUsername();
+      setUsername(storedUsername);
+    } catch (error) {
+      console.error('Error loading username:', error);
+    }
+  };
 
   const checkBiometricAvailability = async () => {
     try {
@@ -101,7 +112,7 @@ export default function LoginScreen() {
           <View style={styles.iconContainer}>
             <Ionicons name="shield-checkmark" size={64} color={COLORS.primary} />
           </View>
-          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.title}>Welcome Back{username ? `, ${username}` : ''}</Text>
           <Text style={styles.subtitle}>
             Enter your master password to unlock OneLock
           </Text>

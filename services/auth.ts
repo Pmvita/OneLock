@@ -56,13 +56,15 @@ export class AuthenticationService {
   /**
    * Set up master password (first time setup)
    */
-  static async setupMasterPassword(password: string): Promise<void> {
+  static async setupMasterPassword(username: string, password: string): Promise<void> {
     try {
       const hash = await MockEncryptionService.hashPassword(password);
       await SecureStorageService.setItem(STORAGE_KEYS.MASTER_PASSWORD_HASH, hash);
+      await SecureStorageService.setItem(STORAGE_KEYS.USERNAME, username);
       
       // Set default settings
       await this.updateSettings({
+        username,
         biometricEnabled: false,
         autoLockMinutes: 5,
         theme: 'light',
@@ -129,11 +131,13 @@ export class AuthenticationService {
    */
   static async getSettings(): Promise<UserSettings> {
     try {
+      const username = await SecureStorageService.getItem(STORAGE_KEYS.USERNAME);
       const biometricEnabled = await SecureStorageService.getItem(STORAGE_KEYS.BIOMETRIC_ENABLED);
       const autoLockMinutes = await SecureStorageService.getItem(STORAGE_KEYS.AUTO_LOCK_MINUTES);
       const theme = await SecureStorageService.getItem(STORAGE_KEYS.THEME);
 
       return {
+        username: username || undefined,
         biometricEnabled: biometricEnabled === 'true',
         autoLockMinutes: autoLockMinutes ? parseInt(autoLockMinutes) : 5,
         theme: (theme as 'light' | 'dark' | 'system') || 'light',
@@ -141,6 +145,7 @@ export class AuthenticationService {
     } catch (error) {
       console.error('Error getting settings:', error);
       return {
+        username: undefined,
         biometricEnabled: false,
         autoLockMinutes: 5,
         theme: 'light',
@@ -153,6 +158,10 @@ export class AuthenticationService {
    */
   static async updateSettings(settings: Partial<UserSettings>): Promise<void> {
     try {
+      if (settings.username !== undefined) {
+        await SecureStorageService.setItem(STORAGE_KEYS.USERNAME, settings.username);
+      }
+
       if (settings.biometricEnabled !== undefined) {
         await SecureStorageService.setItem(
           STORAGE_KEYS.BIOMETRIC_ENABLED,
@@ -188,6 +197,7 @@ export class AuthenticationService {
       return {
         isAuthenticated: false, // Will be set by the app state
         isFirstLaunch: !isMasterPasswordSet,
+        username: settings.username,
         biometricAvailable,
         biometricEnabled: settings.biometricEnabled,
       };
@@ -196,6 +206,7 @@ export class AuthenticationService {
       return {
         isAuthenticated: false,
         isFirstLaunch: true,
+        username: undefined,
         biometricAvailable: false,
         biometricEnabled: false,
       };
@@ -251,6 +262,30 @@ export class AuthenticationService {
     } catch (error) {
       console.error('Error checking auto-lock:', error);
       return true; // Default to locking on error
+    }
+  }
+
+  /**
+   * Set username
+   */
+  static async setUsername(username: string): Promise<void> {
+    try {
+      await SecureStorageService.setItem(STORAGE_KEYS.USERNAME, username);
+    } catch (error) {
+      console.error('Error setting username:', error);
+      throw new Error('Failed to set username');
+    }
+  }
+
+  /**
+   * Get username
+   */
+  static async getUsername(): Promise<string | null> {
+    try {
+      return await SecureStorageService.getItem(STORAGE_KEYS.USERNAME);
+    } catch (error) {
+      console.error('Error getting username:', error);
+      return null;
     }
   }
 
