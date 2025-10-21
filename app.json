@@ -27,6 +27,8 @@
       "package": "com.onelock.app",
       "permissions": [
         "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT"
       ]
     },
@@ -47,6 +49,12 @@
         "projectId": "ba4fddae-6038-44d0-8c3c-90ead03df6ea"
       }
     },
-    "owner": "pmvita"
+    "owner": "pmvita",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ba4fddae-6038-44d0-8c3c-90ead03df6ea"
+    }
   }
 }
