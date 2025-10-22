@@ -175,7 +175,7 @@ export const StrengthMeter: React.FC<StrengthMeterProps> = ({
       </View>
       <View style={styles.strengthLabels}>
         <Text style={[styles.strengthLabel, { color }]}>
-          {strength.replace('-', ' ').toUpperCase()}
+          {strength ? strength.replace('-', ' ').toUpperCase() : 'UNKNOWN'}
         </Text>
         {showScore && (
           <Text style={[styles.strengthScore, { color }]}>
