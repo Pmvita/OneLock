@@ -13,11 +13,13 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { PasswordDataService } from '@/services';
 import { PasswordEntry, PasswordCategory, SearchFilters } from '@/types';
-import { COLORS, SPACING, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '@/constants';
+import { SPACING, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '@/constants';
 import { SearchUtils } from '@/utils';
 import { PasswordCard, EmptyState, Button, Input } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function VaultScreen() {
+  const { colors } = useTheme();
   const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
   const [filteredPasswords, setFilteredPasswords] = useState<PasswordEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -216,7 +218,7 @@ export default function VaultScreen() {
             <Ionicons
               name="heart"
               size={16}
-              color={showFavoritesOnly ? COLORS.white : COLORS.gray500}
+              color={showFavoritesOnly ? colors.white : colors.gray500}
             />
             <Text
               style={[
@@ -256,7 +258,7 @@ export default function VaultScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       {renderHeader()}
       
       <FlatList
@@ -277,14 +279,14 @@ export default function VaultScreen() {
           onPress={handleGeneratorPress}
           activeOpacity={0.8}
         >
-          <Ionicons name="key" size={24} color={COLORS.white} />
+          <Ionicons name="key" size={24} color={colors.white} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.fab, styles.fabPrimary]}
           onPress={handleAddPassword}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={24} color={COLORS.white} />
+          <Ionicons name="add" size={24} color={colors.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -294,14 +296,11 @@ export default function VaultScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
   },
   header: {
-    backgroundColor: COLORS.white,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   searchContainer: {
     marginBottom: SPACING.md,
@@ -319,19 +318,17 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     marginRight: SPACING.sm,
     borderRadius: 20,
-    backgroundColor: COLORS.gray100,
   },
   filterButtonActive: {
-    backgroundColor: COLORS.primary,
+    // Will be set dynamically
   },
   filterButtonText: {
     fontSize: FONT_SIZES.sm,
     fontWeight: FONT_WEIGHTS.medium,
-    color: COLORS.gray500,
     marginLeft: SPACING.xs,
   },
   filterButtonTextActive: {
-    color: COLORS.white,
+    // Will be set dynamically
   },
   listContent: {
     padding: SPACING.md,
@@ -347,13 +344,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.gray500,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.sm,
     ...SHADOWS.lg,
   },
   fabPrimary: {
-    backgroundColor: COLORS.primary,
+    // Will be set dynamically
   },
 });

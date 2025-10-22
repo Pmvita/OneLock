@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ButtonProps {
   title: string;
@@ -39,6 +40,7 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const { colors } = useTheme();
   const getButtonStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       borderRadius: BORDER_RADIUS.md,
@@ -68,18 +70,18 @@ export const Button: React.FC<ButtonProps> = ({
     // Variant styles
     switch (variant) {
       case 'secondary':
-        baseStyle.backgroundColor = COLORS.secondary;
+        baseStyle.backgroundColor = colors.secondary;
         break;
       case 'outline':
         baseStyle.backgroundColor = 'transparent';
         baseStyle.borderWidth = 1;
-        baseStyle.borderColor = COLORS.primary;
+        baseStyle.borderColor = colors.primary;
         break;
       case 'ghost':
         baseStyle.backgroundColor = 'transparent';
         break;
       default: // primary
-        baseStyle.backgroundColor = COLORS.primary;
+        baseStyle.backgroundColor = colors.primary;
     }
 
     if (disabled) {
@@ -110,10 +112,10 @@ export const Button: React.FC<ButtonProps> = ({
     switch (variant) {
       case 'outline':
       case 'ghost':
-        baseStyle.color = COLORS.primary;
+        baseStyle.color = colors.primary;
         break;
       default:
-        baseStyle.color = COLORS.white;
+        baseStyle.color = colors.white;
     }
 
     return baseStyle;
@@ -155,7 +157,7 @@ export const Button: React.FC<ButtonProps> = ({
           style={[
             StyleSheet.absoluteFillObject,
             {
-              backgroundColor: COLORS.primary,
+              backgroundColor: colors.primary,
               borderRadius: BORDER_RADIUS.md,
             }
           ]}
@@ -192,8 +194,9 @@ export const Card: React.FC<CardProps> = ({
   shadow = 'md',
   gradient = false,
 }) => {
+  const { colors } = useTheme();
   const cardStyle: ViewStyle = {
-    backgroundColor: COLORS.white,
+    backgroundColor: colors.white,
     borderRadius: BORDER_RADIUS.lg,
     padding,
     ...SHADOWS[shadow],
@@ -205,7 +208,7 @@ export const Card: React.FC<CardProps> = ({
         style={[
           StyleSheet.absoluteFillObject,
           {
-            backgroundColor: COLORS.white,
+            backgroundColor: colors.white,
             borderRadius: BORDER_RADIUS.lg,
           }
         ]}
@@ -251,17 +254,18 @@ export const Input: React.FC<InputProps> = ({
   numberOfLines = 1,
   style,
 }) => {
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = React.useState(false);
 
   const inputStyle: any = {
     borderWidth: 1,
-    borderColor: error ? COLORS.error : isFocused ? COLORS.primary : COLORS.border,
+    borderColor: error ? colors.error : isFocused ? colors.primary : colors.border,
     borderRadius: BORDER_RADIUS.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     fontSize: FONT_SIZES.md,
-    backgroundColor: disabled ? COLORS.gray100 : COLORS.white,
-    color: disabled ? COLORS.gray500 : COLORS.textPrimary,
+    backgroundColor: disabled ? colors.gray100 : colors.white,
+    color: disabled ? colors.gray500 : colors.textPrimary,
   };
 
   if (multiline) {
@@ -279,7 +283,7 @@ export const Input: React.FC<InputProps> = ({
       <TextInput
         style={inputStyle}
         placeholder={placeholder}
-        placeholderTextColor={COLORS.gray400}
+        placeholderTextColor={colors.gray400}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
@@ -307,13 +311,14 @@ interface LoadingSpinnerProps {
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'medium',
-  color = COLORS.primary,
+  color,
 }) => {
+  const { colors } = useTheme();
   const spinnerSize = size === 'small' ? 20 : size === 'large' ? 40 : 30;
 
   return (
     <View style={styles.spinnerContainer}>
-      <ActivityIndicator size={spinnerSize} color={color} />
+      <ActivityIndicator size={spinnerSize} color={color || colors.primary} />
     </View>
   );
 };
@@ -322,12 +327,10 @@ const styles = StyleSheet.create({
   label: {
     fontSize: FONT_SIZES.sm,
     fontWeight: FONT_WEIGHTS.medium,
-    color: COLORS.textPrimary,
     marginBottom: SPACING.xs,
   },
   errorText: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.error,
     marginTop: SPACING.xs,
   },
   spinnerContainer: {

@@ -1,15 +1,18 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import { COLORS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
+import { FONT_SIZES, FONT_WEIGHTS } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function AuthLayout() {
+  const { colors } = useTheme();
+  
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: COLORS.white,
+          backgroundColor: colors.white,
         },
-        headerTintColor: COLORS.textPrimary,
+        headerTintColor: colors.textPrimary,
         headerTitleStyle: {
           fontSize: FONT_SIZES.lg,
           fontWeight: FONT_WEIGHTS.semibold,

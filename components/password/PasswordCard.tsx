@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PasswordEntry, PasswordCategory } from '@/types';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS, CATEGORY_COLORS, CATEGORY_ICONS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS, CATEGORY_COLORS, CATEGORY_ICONS } from '@/constants';
 import { PasswordStrengthChecker } from '@/utils';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface PasswordCardProps {
   password: PasswordEntry;
@@ -33,7 +34,7 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.card, style]}
+      style={[styles.card, { backgroundColor: colors.white }, style]}
       onPress={onPress}
       activeOpacity={0.7}
     >
@@ -41,10 +42,10 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
         <View style={styles.titleContainer}>
           <View style={[styles.categoryIndicator, { backgroundColor: CATEGORY_COLORS[password.category] }]} />
           <View style={styles.titleTextContainer}>
-            <Text style={styles.title} numberOfLines={1}>
+            <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>
               {password.title}
             </Text>
-            <Text style={styles.subtitle} numberOfLines={1}>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
               {password.username || password.email || 'No username'}
             </Text>
           </View>
@@ -57,21 +58,21 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
           <Ionicons
             name={password.isFavorite ? 'heart' : 'heart-outline'}
             size={20}
-            color={password.isFavorite ? COLORS.error : COLORS.gray400}
+            color={password.isFavorite ? colors.error : colors.gray400}
           />
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
         <View style={styles.passwordContainer}>
-          <Text style={styles.passwordText} numberOfLines={1}>
+          <Text style={[styles.passwordText, { color: colors.textSecondary }]} numberOfLines={1}>
             {'•'.repeat(Math.min(password.password.length, 20))}
           </Text>
           <View style={[styles.strengthIndicator, { backgroundColor: strengthColor }]} />
         </View>
 
         {password.url && (
-          <Text style={styles.urlText} numberOfLines={1}>
+          <Text style={[styles.urlText, { color: colors.textTertiary }]} numberOfLines={1}>
             {password.url}
           </Text>
         )}
@@ -95,14 +96,14 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
             style={styles.actionButton}
             hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           >
-            <Ionicons name="create-outline" size={16} color={COLORS.gray500} />
+            <Ionicons name="create-outline" size={16} color={colors.gray500} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onDeletePress}
             style={styles.actionButton}
             hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           >
-            <Ionicons name="trash-outline" size={16} color={COLORS.error} />
+            <Ionicons name="trash-outline" size={16} color={colors.error} />
           </TouchableOpacity>
         </View>
       </View>
@@ -203,18 +204,19 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   onActionPress,
   style,
 }) => {
+  const { colors } = useTheme();
   return (
     <View style={[styles.emptyState, style]}>
-      <Ionicons name={icon} size={64} color={COLORS.gray300} />
-      <Text style={styles.emptyTitle}>{title}</Text>
-      <Text style={styles.emptyDescription}>{description}</Text>
+      <Ionicons name={icon} size={64} color={colors.gray300} />
+      <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{title}</Text>
+      <Text style={[styles.emptyDescription, { color: colors.textSecondary }]}>{description}</Text>
       {actionTitle && onActionPress && (
         <TouchableOpacity
-          style={styles.emptyAction}
+          style={[styles.emptyAction, { backgroundColor: colors.primary }]}
           onPress={onActionPress}
           activeOpacity={0.7}
         >
-          <Text style={styles.emptyActionText}>{actionTitle}</Text>
+          <Text style={[styles.emptyActionText, { color: colors.white }]}>{actionTitle}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -223,7 +225,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
     marginBottom: SPACING.md,
@@ -252,11 +253,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
   },
   subtitle: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
     marginTop: 2,
   },
   favoriteButton: {
@@ -272,7 +271,6 @@ const styles = StyleSheet.create({
   },
   passwordText: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
     flex: 1,
     fontFamily: 'monospace',
   },
@@ -284,7 +282,6 @@ const styles = StyleSheet.create({
   },
   urlText: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.textTertiary,
   },
   footer: {
     flexDirection: 'row',
@@ -330,7 +327,6 @@ const styles = StyleSheet.create({
   },
   strengthBar: {
     height: 6,
-    backgroundColor: COLORS.gray200,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -360,13 +356,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
     marginTop: SPACING.md,
     textAlign: 'center',
   },
   emptyDescription: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
     lineHeight: 20,
@@ -375,12 +369,10 @@ const styles = StyleSheet.create({
     marginTop: SPACING.lg,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.primary,
     borderRadius: BORDER_RADIUS.md,
   },
   emptyActionText: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.white,
   },
 });

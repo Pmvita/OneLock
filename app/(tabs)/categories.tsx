@@ -10,10 +10,12 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { PasswordDataService } from '@/services';
 import { PasswordEntry, PasswordCategory } from '@/types';
-import { COLORS, SPACING, FONT_SIZES, FONT_WEIGHTS, CATEGORY_COLORS, CATEGORY_ICONS, BORDER_RADIUS, SHADOWS } from '@/constants';
+import { SPACING, FONT_SIZES, FONT_WEIGHTS, CATEGORY_COLORS, CATEGORY_ICONS, BORDER_RADIUS, SHADOWS } from '@/constants';
 import { CategoryBadge, EmptyState } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function CategoriesScreen() {
+  const { colors } = useTheme();
   const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
   const [categoryStats, setCategoryStats] = useState<Record<PasswordCategory, number>>({
     Social: 0,
@@ -82,12 +84,52 @@ export default function CategoriesScreen() {
           <Text style={styles.categoryCount}>{count} password{count !== 1 ? 's' : ''}</Text>
         </View>
 
-        <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />
+        <Ionicons name="chevron-forward" size={20} color={colors.gray400} />
       </TouchableOpacity>
     );
   };
 
   const categories: PasswordCategory[] = ['Social', 'Finance', 'Work', 'Shopping', 'Entertainment', 'Other'];
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.backgroundSecondary,
+    },
+    listContent: {
+      padding: SPACING.md,
+    },
+    categoryCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.white,
+      borderRadius: BORDER_RADIUS.lg,
+      padding: SPACING.md,
+      marginBottom: SPACING.md,
+      ...SHADOWS.md,
+    },
+    categoryIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: SPACING.md,
+    },
+    categoryInfo: {
+      flex: 1,
+    },
+    categoryName: {
+      fontSize: FONT_SIZES.lg,
+      fontWeight: FONT_WEIGHTS.semibold,
+      color: colors.textPrimary,
+      marginBottom: SPACING.xs,
+    },
+    categoryCount: {
+      fontSize: FONT_SIZES.sm,
+      color: colors.textSecondary,
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -108,43 +150,3 @@ export default function CategoriesScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
-  },
-  listContent: {
-    padding: SPACING.md,
-  },
-  categoryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-    ...SHADOWS.md,
-  },
-  categoryIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
-  categoryInfo: {
-    flex: 1,
-  },
-  categoryName: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
-  },
-  categoryCount: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-  },
-});

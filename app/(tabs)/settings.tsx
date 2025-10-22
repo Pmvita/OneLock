@@ -11,10 +11,12 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthenticationService } from '@/services';
 import { UserSettings, AuthState } from '@/types';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, AUTO_LOCK_OPTIONS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, AUTO_LOCK_OPTIONS } from '@/constants';
 import { Button, Card } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function SettingsScreen() {
+  const { colors, theme, setTheme } = useTheme();
   const [settings, setSettings] = useState<UserSettings>({
     biometricEnabled: false,
     autoLockMinutes: 5,
@@ -127,8 +129,8 @@ export default function SettingsScreen() {
     updateSetting('autoLockMinutes', minutes);
   };
 
-  const handleThemeChange = (theme: 'light' | 'dark' | 'system') => {
-    updateSetting('theme', theme);
+  const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
+    await setTheme(newTheme);
   };
 
   const handleExportData = () => {
@@ -188,7 +190,7 @@ export default function SettingsScreen() {
         {/* Security Settings */}
         <Card style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="shield-checkmark" size={24} color={COLORS.primary} />
+            <Ionicons name="shield-checkmark" size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Security</Text>
           </View>
 
@@ -221,8 +223,8 @@ export default function SettingsScreen() {
                 handleBiometricToggle(value);
               }}
               disabled={false} // Allow testing even when biometrics not available
-              trackColor={{ false: COLORS.gray300, true: COLORS.primary + '50' }}
-              thumbColor={settings.biometricEnabled ? COLORS.primary : COLORS.gray400}
+              trackColor={{ false: colors.gray300, true: colors.primary + '50' }}
+              thumbColor={settings.biometricEnabled ? colors.primary : colors.gray400}
             />
           </View>
 
@@ -243,7 +245,7 @@ export default function SettingsScreen() {
         {/* Appearance Settings */}
         <Card style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="color-palette" size={24} color={COLORS.secondary} />
+            <Ionicons name="color-palette" size={24} color={colors.secondary} />
             <Text style={styles.sectionTitle}>Appearance</Text>
           </View>
 
@@ -260,21 +262,21 @@ export default function SettingsScreen() {
             <Button
               title="Light"
               onPress={() => handleThemeChange('light')}
-              variant={settings.theme === 'light' ? 'primary' : 'outline'}
+              variant={theme === 'light' ? 'primary' : 'outline'}
               size="small"
               style={styles.themeButton}
             />
             <Button
               title="Dark"
               onPress={() => handleThemeChange('dark')}
-              variant={settings.theme === 'dark' ? 'primary' : 'outline'}
+              variant={theme === 'dark' ? 'primary' : 'outline'}
               size="small"
               style={styles.themeButton}
             />
             <Button
               title="System"
               onPress={() => handleThemeChange('system')}
-              variant={settings.theme === 'system' ? 'primary' : 'outline'}
+              variant={theme === 'system' ? 'primary' : 'outline'}
               size="small"
               style={styles.themeButton}
             />
@@ -284,7 +286,7 @@ export default function SettingsScreen() {
         {/* Data Management */}
         <Card style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="cloud-download" size={24} color={COLORS.accent} />
+            <Ionicons name="cloud-download" size={24} color={colors.accent} />
             <Text style={styles.sectionTitle}>Data Management</Text>
           </View>
 
@@ -322,7 +324,7 @@ export default function SettingsScreen() {
         {/* About */}
         <Card style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="information-circle" size={24} color={COLORS.gray500} />
+            <Ionicons name="information-circle" size={24} color={colors.gray500} />
             <Text style={styles.sectionTitle}>About</Text>
           </View>
 
@@ -345,8 +347,8 @@ export default function SettingsScreen() {
         {/* Danger Zone */}
         <Card style={[styles.sectionCard, styles.dangerCard] as any}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="warning" size={24} color={COLORS.error} />
-            <Text style={[styles.sectionTitle, { color: COLORS.error }]}>Danger Zone</Text>
+            <Ionicons name="warning" size={24} color={colors.error} />
+            <Text style={[styles.sectionTitle, { color: colors.error }]}>Danger Zone</Text>
           </View>
 
           <View style={styles.settingRow}>
@@ -373,7 +375,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
   },
   content: {
     padding: SPACING.md,
@@ -382,7 +383,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.backgroundSecondary,
   },
   sectionCard: {
     marginBottom: SPACING.lg,
@@ -395,7 +395,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
     marginLeft: SPACING.sm,
   },
   settingRow: {
@@ -411,12 +410,10 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.medium,
-    color: COLORS.textPrimary,
     marginBottom: SPACING.xs,
   },
   settingDescription: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
     lineHeight: 18,
   },
   autoLockContainer: {
@@ -445,18 +442,15 @@ const styles = StyleSheet.create({
   },
   aboutLabel: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
   },
   aboutValue: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.medium,
-    color: COLORS.textPrimary,
   },
   dangerCard: {
     borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
   } as any,
   dangerButton: {
-    borderColor: COLORS.error,
+    // Will be set dynamically
   },
 });

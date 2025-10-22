@@ -11,10 +11,12 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthenticationService } from '@/services';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { Button, Input, Card } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function LoginScreen() {
+  const { colors } = useTheme();
   const [username, setUsername] = useState<string | null>(null);
   const [masterPassword, setMasterPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -109,7 +111,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Home Button */}
@@ -119,17 +121,17 @@ export default function LoginScreen() {
           onPress={handleHomePress}
           activeOpacity={0.7}
         >
-          <Ionicons name="home" size={24} color={COLORS.primary} />
+          <Ionicons name="home" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.iconContainer}>
-            <Ionicons name="shield-checkmark" size={64} color={COLORS.primary} />
+            <Ionicons name="shield-checkmark" size={64} color={colors.primary} />
           </View>
-          <Text style={styles.title}>Welcome Back{username ? `, ${username}` : ''}</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Welcome Back{username ? `, ${username}` : ''}</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Enter your master password to unlock OneLock
           </Text>
         </View>
@@ -168,7 +170,7 @@ export default function LoginScreen() {
         {biometricAvailable && biometricEnabled && (
           <Card style={styles.biometricCard}>
             <View style={styles.biometricHeader}>
-              <Ionicons name="finger-print" size={24} color={COLORS.accent} />
+              <Ionicons name="finger-print" size={24} color={colors.accent} />
               <Text style={styles.biometricTitle}>Quick Access</Text>
             </View>
             
@@ -197,7 +199,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
   },
   headerContainer: {
     paddingTop: SPACING.xl + SPACING.lg,
@@ -209,7 +210,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: COLORS.primary + '20',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
@@ -239,13 +238,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FONT_SIZES.xxxl,
     fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.textPrimary,
     textAlign: 'center',
     marginBottom: SPACING.sm,
   },
   subtitle: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
     paddingHorizontal: SPACING.lg,
@@ -274,7 +271,6 @@ const styles = StyleSheet.create({
   biometricTitle: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
     marginLeft: SPACING.sm,
   },
   biometricButton: {
@@ -285,7 +281,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.textTertiary,
     textAlign: 'center',
     lineHeight: 16,
     paddingHorizontal: SPACING.lg,

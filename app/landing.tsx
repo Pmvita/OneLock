@@ -8,10 +8,12 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { Button, Card } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function LandingScreen() {
+  const { colors } = useTheme();
   const handleSetup = () => {
     router.push('/auth/setup');
   };
@@ -22,42 +24,42 @@ export default function LandingScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.iconContainer}>
-            <Ionicons name="shield-checkmark" size={80} color={COLORS.primary} />
+            <Ionicons name="shield-checkmark" size={80} color={colors.primary} />
           </View>
-          <Text style={styles.title}>OneLock</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>OneLock</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Secure password management for your digital life
           </Text>
         </View>
 
         <Card style={styles.featuresCard}>
           <View style={styles.featuresHeader}>
-            <Ionicons name="lock-closed" size={24} color={COLORS.accent} />
-            <Text style={styles.featuresTitle}>Security Features</Text>
+            <Ionicons name="lock-closed" size={24} color={colors.accent} />
+            <Text style={[styles.featuresTitle, { color: colors.textPrimary }]}>Security Features</Text>
           </View>
           
           <View style={styles.featureList}>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-              <Text style={styles.featureText}>End-to-end encryption</Text>
+              <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+              <Text style={[styles.featureText, { color: colors.textPrimary }]}>End-to-end encryption</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-              <Text style={styles.featureText}>Biometric authentication</Text>
+              <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+              <Text style={[styles.featureText, { color: colors.textPrimary }]}>Biometric authentication</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-              <Text style={styles.featureText}>Auto-lock protection</Text>
+              <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+              <Text style={[styles.featureText, { color: colors.textPrimary }]}>Auto-lock protection</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-              <Text style={styles.featureText}>Secure local storage</Text>
+              <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+              <Text style={[styles.featureText, { color: colors.textPrimary }]}>Secure local storage</Text>
             </View>
           </View>
         </Card>
@@ -81,7 +83,7 @@ export default function LandingScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
             Your passwords are encrypted and stored securely on your device
           </Text>
         </View>
@@ -93,7 +95,6 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
   },
   content: {
     flex: 1,
@@ -108,7 +109,6 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: COLORS.primary + '20',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
@@ -116,13 +116,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FONT_SIZES.xxxl,
     fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.textPrimary,
     textAlign: 'center',
     marginBottom: SPACING.sm,
   },
   subtitle: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
     paddingHorizontal: SPACING.lg,
@@ -138,7 +136,6 @@ const styles = StyleSheet.create({
   featuresTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
     marginLeft: SPACING.sm,
   },
   featureList: {
@@ -150,7 +147,6 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
     marginLeft: SPACING.sm,
   },
   actionButtons: {
@@ -168,7 +164,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.textTertiary,
     textAlign: 'center',
     lineHeight: 16,
     paddingHorizontal: SPACING.lg,

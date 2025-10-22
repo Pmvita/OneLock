@@ -3,9 +3,11 @@ import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { router } from 'expo-router';
 import { AuthenticationService } from '@/services';
 import { AuthState } from '@/types';
-import { COLORS, FONT_SIZES, SPACING } from '@/constants';
+import { FONT_SIZES, SPACING } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function IndexScreen() {
+  const { colors } = useTheme();
   const [authState, setAuthState] = useState<AuthState | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -37,9 +39,9 @@ export default function IndexScreen() {
   }, [loading, authState]);
 
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color={COLORS.primary} />
-      <Text style={styles.loadingText}>Checking authentication...</Text>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Text style={[styles.loadingText, { color: colors.textPrimary }]}>Checking authentication...</Text>
     </View>
   );
 }
@@ -49,11 +51,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
   },
   loadingText: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
     marginTop: SPACING.md,
     textAlign: 'center',
   },

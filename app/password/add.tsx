@@ -11,13 +11,15 @@ import {
 import { router } from 'expo-router';
 import { PasswordDataService } from '@/services';
 import { PasswordEntry, PasswordCategory } from '@/types';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { PasswordValidator, URLValidator } from '@/utils';
 import { Button, Input, Card, PasswordGeneratorModal } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const CATEGORIES: PasswordCategory[] = ['Social', 'Finance', 'Work', 'Shopping', 'Entertainment', 'Other'];
 
 export default function AddPasswordScreen() {
+  const { colors } = useTheme();
   const [formData, setFormData] = useState<Partial<PasswordEntry>>({
     title: '',
     username: '',
@@ -106,7 +108,7 @@ export default function AddPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
@@ -230,7 +232,6 @@ export default function AddPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -261,7 +262,6 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: FONT_SIZES.sm,
     fontWeight: FONT_WEIGHTS.medium,
-    color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   },
   categoryButtons: {

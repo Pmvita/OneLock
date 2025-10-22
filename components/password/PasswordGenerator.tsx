@@ -10,9 +10,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PasswordGeneratorOptions } from '@/types';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS } from '@/constants';
 import { PasswordGenerator, PasswordStrengthChecker } from '@/utils';
 import { Button, Card } from '../ui/Button';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface PasswordGeneratorModalProps {
   visible: boolean;
@@ -25,6 +26,7 @@ export const PasswordGeneratorModal: React.FC<PasswordGeneratorModalProps> = ({
   onClose,
   onPasswordGenerated,
 }) => {
+  const { colors } = useTheme();
   const [options, setOptions] = useState<PasswordGeneratorOptions>({
     length: 16,
     includeUppercase: true,
@@ -79,7 +81,7 @@ export const PasswordGeneratorModal: React.FC<PasswordGeneratorModalProps> = ({
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+            <Ionicons name="close" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.title}>Password Generator</Text>
           <View style={styles.placeholder} />
@@ -99,7 +101,7 @@ export const PasswordGeneratorModal: React.FC<PasswordGeneratorModalProps> = ({
                     console.log('Copy password:', generatedPassword);
                   }}
                 >
-                  <Ionicons name="copy-outline" size={20} color={COLORS.primary} />
+                  <Ionicons name="copy-outline" size={20} color={colors.primary} />
                 </TouchableOpacity>
               )}
             </View>
@@ -134,7 +136,7 @@ export const PasswordGeneratorModal: React.FC<PasswordGeneratorModalProps> = ({
                   style={styles.sliderButton}
                   onPress={() => updateOption('length', Math.max(4, options.length - 1))}
                 >
-                  <Ionicons name="remove" size={16} color={COLORS.primary} />
+                  <Ionicons name="remove" size={16} color={colors.primary} />
                 </TouchableOpacity>
                 <View style={styles.sliderTrack}>
                   <View
@@ -148,7 +150,7 @@ export const PasswordGeneratorModal: React.FC<PasswordGeneratorModalProps> = ({
                   style={styles.sliderButton}
                   onPress={() => updateOption('length', Math.min(32, options.length + 1))}
                 >
-                  <Ionicons name="add" size={16} color={COLORS.primary} />
+                  <Ionicons name="add" size={16} color={colors.primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -253,6 +255,7 @@ interface OptionToggleProps {
 }
 
 const OptionToggle: React.FC<OptionToggleProps> = ({ title, value, onToggle }) => {
+  const { colors } = useTheme();
   return (
     <TouchableOpacity
       style={styles.optionRow}
@@ -270,7 +273,6 @@ const OptionToggle: React.FC<OptionToggleProps> = ({ title, value, onToggle }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
   },
   header: {
     flexDirection: 'row',
@@ -278,9 +280,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   closeButton: {
     padding: SPACING.xs,
@@ -288,7 +288,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
   },
   placeholder: {
     width: 40,
@@ -309,8 +308,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FONT_SIZES.md,
     fontFamily: 'monospace',
-    color: COLORS.textPrimary,
-    backgroundColor: COLORS.gray100,
     padding: SPACING.sm,
     borderRadius: BORDER_RADIUS.sm,
     marginRight: SPACING.sm,
@@ -324,13 +321,11 @@ const styles = StyleSheet.create({
   },
   strengthLabel: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
     marginRight: SPACING.sm,
   },
   strengthBar: {
     flex: 1,
     height: 6,
-    backgroundColor: COLORS.gray200,
     borderRadius: 3,
     marginRight: SPACING.sm,
     overflow: 'hidden',
@@ -349,7 +344,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.textPrimary,
     marginBottom: SPACING.md,
   },
   lengthContainer: {
@@ -358,7 +352,6 @@ const styles = StyleSheet.create({
   lengthLabel: {
     fontSize: FONT_SIZES.xl,
     fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.primary,
     marginBottom: SPACING.md,
   },
   sliderContainer: {
@@ -370,21 +363,18 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.primary + '20',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sliderTrack: {
     flex: 1,
     height: 6,
-    backgroundColor: COLORS.gray200,
     borderRadius: 3,
     marginHorizontal: SPACING.md,
     overflow: 'hidden',
   },
   sliderFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
     borderRadius: 3,
   },
   optionRow: {
@@ -395,25 +385,22 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textPrimary,
     flex: 1,
   },
   toggle: {
     width: 44,
     height: 24,
     borderRadius: 12,
-    backgroundColor: COLORS.gray300,
     justifyContent: 'center',
     paddingHorizontal: 2,
   },
   toggleActive: {
-    backgroundColor: COLORS.primary,
+    // Will be set dynamically
   },
   toggleThumb: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: COLORS.white,
     alignSelf: 'flex-start',
   },
   toggleThumbActive: {
@@ -433,9 +420,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     padding: SPACING.md,
-    backgroundColor: COLORS.white,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
   },
   generateButton: {
     flex: 1,

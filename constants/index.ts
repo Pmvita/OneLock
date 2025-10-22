@@ -187,3 +187,6 @@ export const STORAGE_KEYS = {
   PASSWORDS_DATA: 'passwords_data',
   LAST_UNLOCK_TIME: 'last_unlock_time',
 };
+
+// Re-export theme-related types and constants for backward compatibility
+export type ThemeMode = 'light' | 'dark' | 'system';

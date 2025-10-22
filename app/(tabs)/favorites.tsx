@@ -11,10 +11,12 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { PasswordDataService } from '@/services';
 import { PasswordEntry } from '@/types';
-import { COLORS, SPACING, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
+import { SPACING, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { PasswordCard, EmptyState } from '@/components';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function FavoritesScreen() {
+  const { colors } = useTheme();
   const [favoritePasswords, setFavoritePasswords] = useState<PasswordEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -99,6 +101,34 @@ export default function FavoritesScreen() {
     );
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.backgroundSecondary,
+    },
+    header: {
+      backgroundColor: colors.white,
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: FONT_SIZES.xl,
+      fontWeight: FONT_WEIGHTS.bold,
+      color: colors.textPrimary,
+      marginBottom: SPACING.xs,
+    },
+    headerSubtitle: {
+      fontSize: FONT_SIZES.md,
+      color: colors.textSecondary,
+    },
+    listContent: {
+      padding: SPACING.md,
+      flexGrow: 1,
+    },
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -119,31 +149,3 @@ export default function FavoritesScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.backgroundSecondary,
-  },
-  header: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
-  },
-  headerSubtitle: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-  },
-  listContent: {
-    padding: SPACING.md,
-    flexGrow: 1,
-  },
-});
