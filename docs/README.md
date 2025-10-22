@@ -89,6 +89,8 @@ OneLock is a professional-grade password and credential manager built with React
    npm run android # Android Emulator
    ```
 
+   > **Note**: For Android emulator setup, see the detailed [Android Emulator Setup Guide](guides/android-emulator-setup.md)
+
 ### EAS Build Setup
 
 1. **Install EAS CLI**
