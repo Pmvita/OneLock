@@ -1,5 +1,6 @@
 import * as LocalAuthentication from 'expo-local-authentication';
 import { SecureStorageService, MockEncryptionService } from './storage';
+import { MasterUserService } from './masterUser';
 import { STORAGE_KEYS } from '@/constants';
 import { AuthState, UserSettings } from '@/types';
 
@@ -57,15 +58,24 @@ export class AuthenticationService {
   /**
    * Set up master password (first time setup)
    */
-  static async setupMasterPassword(username: string, password: string): Promise<void> {
+  static async setupMasterPassword(username: string, password: string, userType: 'master' | 'local' = 'local'): Promise<void> {
     try {
+      // Check if this is a master user
+      if (userType === 'master') {
+        await MasterUserService.initializeMasterUser(username, password);
+        return;
+      }
+
+      // Regular local user setup
       const hash = await MockEncryptionService.hashPassword(password);
       await SecureStorageService.setItem(STORAGE_KEYS.MASTER_PASSWORD_HASH, hash);
       await SecureStorageService.setItem(STORAGE_KEYS.USERNAME, username);
+      await SecureStorageService.setItem(STORAGE_KEYS.USER_TYPE, userType);
       
       // Set default settings
       await this.updateSettings({
         username,
+        userType,
         biometricEnabled: false,
         autoLockMinutes: 5,
         theme: 'light',
@@ -81,6 +91,13 @@ export class AuthenticationService {
    */
   static async verifyMasterPassword(password: string): Promise<boolean> {
     try {
+      // Check if current user is master user
+      const settings = await this.getSettings();
+      if (settings.userType === 'master') {
+        return await MasterUserService.verifyMasterUserPassword(password);
+      }
+
+      // Regular local user verification
       const storedHash = await SecureStorageService.getItem(STORAGE_KEYS.MASTER_PASSWORD_HASH);
       
       if (!storedHash) {
@@ -194,6 +211,7 @@ export class AuthenticationService {
       const isMasterPasswordSet = await this.isMasterPasswordSet();
       const biometricAvailable = await this.isBiometricAvailable();
       const settings = await this.getSettings();
+      const lastLoggedInUser = await this.getLastLoggedInUser();
 
       return {
         isAuthenticated: false, // Will be set by the app state
@@ -201,6 +219,7 @@ export class AuthenticationService {
         username: settings.username,
         biometricAvailable,
         biometricEnabled: settings.biometricEnabled,
+        lastLoggedInUser: lastLoggedInUser || undefined,
       };
     } catch (error) {
       console.error('Error getting auth state:', error);
@@ -210,7 +229,31 @@ export class AuthenticationService {
         username: undefined,
         biometricAvailable: false,
         biometricEnabled: false,
+        lastLoggedInUser: undefined,
       };
+    }
+  }
+
+  /**
+   * Set last logged in user
+   */
+  static async setLastLoggedInUser(username: string): Promise<void> {
+    try {
+      await SecureStorageService.setItem(STORAGE_KEYS.LAST_LOGGED_IN_USER, username);
+    } catch (error) {
+      console.error('Error setting last logged in user:', error);
+    }
+  }
+
+  /**
+   * Get last logged in user
+   */
+  static async getLastLoggedInUser(): Promise<string | null> {
+    try {
+      return await SecureStorageService.getItem(STORAGE_KEYS.LAST_LOGGED_IN_USER);
+    } catch (error) {
+      console.error('Error getting last logged in user:', error);
+      return null;
     }
   }
 

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthenticationService } from '@/services';
+import { AuthenticationService, MasterUserService } from '@/services';
 import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { Button, Input, Card } from '@/components';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -24,6 +24,8 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [isMasterUser, setIsMasterUser] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
   useEffect(() => {
     checkBiometricAvailability();
@@ -34,6 +36,18 @@ export default function LoginScreen() {
     try {
       const storedUsername = await AuthenticationService.getUsername();
       setUsername(storedUsername);
+      
+      // Check if this is a master user
+      if (storedUsername) {
+        const masterUserStatus = await MasterUserService.isMasterUser(storedUsername);
+        setIsMasterUser(masterUserStatus);
+        
+        // Load last sync time for master user
+        if (masterUserStatus) {
+          const syncTime = await MasterUserService.getLastSyncTime();
+          setLastSyncTime(syncTime);
+        }
+      }
     } catch (error) {
       console.error('Error loading username:', error);
     }
@@ -62,6 +76,12 @@ export default function LoginScreen() {
       
       if (isValid) {
         await AuthenticationService.setLastUnlockTime();
+        
+        // Set last logged in user
+        if (username) {
+          await AuthenticationService.setLastLoggedInUser(username);
+        }
+        
         router.replace('/(tabs)');
       } else {
         Alert.alert('Invalid Password', 'The password you entered is incorrect. Please try again.');
@@ -82,6 +102,12 @@ export default function LoginScreen() {
       
       if (success) {
         await AuthenticationService.setLastUnlockTime();
+        
+        // Set last logged in user
+        if (username) {
+          await AuthenticationService.setLastLoggedInUser(username);
+        }
+        
         router.replace('/(tabs)');
       } else {
         Alert.alert('Authentication Failed', 'Biometric authentication was not successful.');

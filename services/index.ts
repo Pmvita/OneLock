@@ -9,3 +9,4 @@ export {
   MockEncryptionService, 
   PasswordDataService 
 } from './storage';
+export { MasterUserService } from './masterUser';

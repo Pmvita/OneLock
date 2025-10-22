@@ -32,8 +32,17 @@ export default function IndexScreen() {
         // No master password exists - new user
         router.replace('/landing');
       } else {
-        // Master password exists - existing user
-        router.replace('/auth/login');
+        // Master password exists - check last logged in user
+        if (authState.lastLoggedInUser === 'pmvita') {
+          // Last user was master user, go to login
+          router.replace('/auth/login');
+        } else if (authState.lastLoggedInUser) {
+          // Last user was local user, go to login
+          router.replace('/auth/login');
+        } else {
+          // No last logged in user, go to landing (which will show account type selection)
+          router.replace('/landing');
+        }
       }
     }
   }, [loading, authState]);

@@ -34,6 +34,7 @@ export interface BreachCheckResult {
 
 export interface UserSettings {
   username?: string;
+  userType: 'master' | 'local';
   masterPasswordHash?: string;
   biometricEnabled: boolean;
   autoLockMinutes: number;
@@ -46,6 +47,7 @@ export interface AuthState {
   username?: string;
   biometricAvailable: boolean;
   biometricEnabled: boolean;
+  lastLoggedInUser?: string;
 }
 
 export interface PasswordGeneratorOptions {

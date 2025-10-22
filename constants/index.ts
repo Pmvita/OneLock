@@ -180,12 +180,14 @@ export const PASSWORD_GENERATOR_DEFAULTS = {
 
 export const STORAGE_KEYS = {
   USERNAME: 'username',
+  USER_TYPE: 'user_type',
   MASTER_PASSWORD_HASH: 'master_password_hash',
   BIOMETRIC_ENABLED: 'biometric_enabled',
   AUTO_LOCK_MINUTES: 'auto_lock_minutes',
   THEME: 'theme',
   PASSWORDS_DATA: 'passwords_data',
   LAST_UNLOCK_TIME: 'last_unlock_time',
+  LAST_LOGGED_IN_USER: 'last_logged_in_user',
 };
 
 // Re-export theme-related types and constants for backward compatibility

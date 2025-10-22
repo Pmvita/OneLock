@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthenticationService } from '@/services';
+import { AuthenticationService, MasterUserService } from '@/services';
 import { UserSettings, AuthState } from '@/types';
 import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, AUTO_LOCK_OPTIONS } from '@/constants';
 import { Button, Card } from '@/components';
@@ -18,12 +18,16 @@ import { useTheme } from '@/contexts/ThemeContext';
 export default function SettingsScreen() {
   const { colors, theme, setTheme } = useTheme();
   const [settings, setSettings] = useState<UserSettings>({
+    userType: 'local',
     biometricEnabled: false,
     autoLockMinutes: 5,
     theme: 'light',
   });
   const [authState, setAuthState] = useState<AuthState | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMasterUser, setIsMasterUser] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -39,6 +43,16 @@ export default function SettingsScreen() {
       console.log('Loaded auth state:', auth);
       setSettings(userSettings);
       setAuthState(auth);
+      
+      // Check if current user is master user
+      const masterUserStatus = await MasterUserService.isCurrentUserMaster();
+      setIsMasterUser(masterUserStatus);
+      
+      // Load last sync time for master user
+      if (masterUserStatus) {
+        const syncTime = await MasterUserService.getLastSyncTime();
+        setLastSyncTime(syncTime);
+      }
     } catch (error) {
       console.error('Error loading settings:', error);
     } finally {
@@ -131,6 +145,53 @@ export default function SettingsScreen() {
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
     await setTheme(newTheme);
+  };
+
+  const handleSyncToCloud = async () => {
+    if (!isMasterUser) return;
+    
+    setSyncing(true);
+    try {
+      await MasterUserService.syncToMockData();
+      const syncTime = await MasterUserService.getLastSyncTime();
+      setLastSyncTime(syncTime);
+      Alert.alert('Sync Complete', 'Your data has been synced successfully!');
+    } catch (error) {
+      Alert.alert('Sync Failed', 'Unable to sync data. Please try again.');
+      console.error('Sync error:', error);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncFromCloud = async () => {
+    if (!isMasterUser) return;
+    
+    Alert.alert(
+      'Sync from Cloud',
+      'This will replace your current data with the synced data. Are you sure?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sync',
+          style: 'destructive',
+          onPress: async () => {
+            setSyncing(true);
+            try {
+              await MasterUserService.syncFromMockData();
+              const syncTime = await MasterUserService.getLastSyncTime();
+              setLastSyncTime(syncTime);
+              Alert.alert('Sync Complete', 'Your data has been synced from cloud!');
+            } catch (error) {
+              Alert.alert('Sync Failed', 'Unable to sync data. Please try again.');
+              console.error('Sync error:', error);
+            } finally {
+              setSyncing(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleExportData = () => {
@@ -282,6 +343,60 @@ export default function SettingsScreen() {
             />
           </View>
         </Card>
+
+        {/* Master User Sync Settings */}
+        {isMasterUser && (
+          <Card style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="cloud" size={24} color={colors.primary} />
+              <Text style={styles.sectionTitle}>Master User Sync</Text>
+            </View>
+
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>Last Sync</Text>
+                <Text style={styles.settingDescription}>
+                  {lastSyncTime 
+                    ? `Last synced: ${lastSyncTime.toLocaleString()}`
+                    : 'Never synced'
+                  }
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>Sync to Cloud</Text>
+                <Text style={styles.settingDescription}>
+                  Upload your current data to cloud storage
+                </Text>
+              </View>
+              <Button
+                title={syncing ? "Syncing..." : "Sync Up"}
+                onPress={handleSyncToCloud}
+                variant="outline"
+                size="small"
+                disabled={syncing}
+              />
+            </View>
+
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>Sync from Cloud</Text>
+                <Text style={styles.settingDescription}>
+                  Download data from cloud storage
+                </Text>
+              </View>
+              <Button
+                title={syncing ? "Syncing..." : "Sync Down"}
+                onPress={handleSyncFromCloud}
+                variant="outline"
+                size="small"
+                disabled={syncing}
+              />
+            </View>
+          </Card>
+        )}
 
         {/* Data Management */}
         <Card style={styles.sectionCard}>

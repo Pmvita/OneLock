@@ -9,9 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthenticationService } from '@/services';
+import { AuthenticationService, MasterUserService } from '@/services';
 import { PasswordDataService } from '@/services/storage';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getTemplatePasswords } from '@/utils/templates';
@@ -20,6 +20,7 @@ import { Button, Input, Card, StrengthMeter } from '@/components';
 
 export default function SetupScreen() {
   const { colors } = useTheme();
+  const { userType } = useLocalSearchParams<{ userType?: string }>();
   const [username, setUsername] = useState('');
   const [masterPassword, setMasterPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,6 +28,10 @@ export default function SetupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [useTemplates, setUseTemplates] = useState(true);
+  const [importMockData, setImportMockData] = useState(false);
+
+  // Determine if this is a master user setup
+  const isMasterUser = userType === 'master' || username.toLowerCase() === 'pmvita';
 
   const handleSetup = async () => {
     if (!username.trim()) {
@@ -49,21 +54,35 @@ export default function SetupScreen() {
       return;
     }
 
+    // For master user, validate credentials
+    if (isMasterUser) {
+      const isValidMasterUser = await MasterUserService.isMasterUser(username.trim());
+      if (!isValidMasterUser) {
+        Alert.alert('Error', 'Invalid master user credentials');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
-      // Set up authentication
-      await AuthenticationService.setup(username.trim(), masterPassword);
+      // Set up authentication with user type
+      const finalUserType = isMasterUser ? 'master' : 'local';
+      await AuthenticationService.setupMasterPassword(username.trim(), masterPassword, finalUserType);
 
-      // Add template passwords if requested
-      if (useTemplates) {
+      // Handle data import based on user type
+      if (isMasterUser && importMockData) {
+        // Import mockData for master user
+        await MasterUserService.syncFromMockData();
+      } else if (!isMasterUser && useTemplates) {
+        // Add template passwords for local user
         const templatePasswords = getTemplatePasswords();
         await PasswordDataService.savePasswords(templatePasswords);
       }
 
       Alert.alert(
         'Setup Complete',
-        'Your OneLock account has been created successfully!',
+        `Your ${isMasterUser ? 'Master' : 'Local'} OneLock account has been created successfully!`,
         [
           {
             text: 'Continue',
@@ -243,29 +262,54 @@ export default function SetupScreen() {
         <Card style={styles.templateCard}>
           <View style={styles.templateHeader}>
             <Ionicons name="document-text" size={24} color={colors.accent} />
-            <Text style={styles.templateTitle}>Get Started</Text>
+            <Text style={styles.templateTitle}>
+              {isMasterUser ? 'Import Data' : 'Get Started'}
+            </Text>
           </View>
           
           <Text style={styles.templateDescription}>
-            Would you like to start with sample passwords to see how OneLock works? 
-            You can always add your own passwords later.
+            {isMasterUser 
+              ? 'Would you like to import sample passwords from mockData to see how OneLock works? This will give you a full vault to explore.'
+              : 'Would you like to start with sample passwords to see how OneLock works? You can always add your own passwords later.'
+            }
           </Text>
 
           <View style={styles.templateButtons}>
-            <Button
-              title="Yes, add samples"
-              onPress={() => setUseTemplates(true)}
-              variant={useTemplates ? 'primary' : 'outline'}
-              size="small"
-              style={{ flex: 1 }}
-            />
-            <Button
-              title="No, start empty"
-              onPress={() => setUseTemplates(false)}
-              variant={!useTemplates ? 'primary' : 'outline'}
-              size="small"
-              style={{ flex: 1 }}
-            />
+            {isMasterUser ? (
+              <>
+                <Button
+                  title="Yes, import mockData"
+                  onPress={() => setImportMockData(true)}
+                  variant={importMockData ? 'primary' : 'outline'}
+                  size="small"
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  title="No, start empty"
+                  onPress={() => setImportMockData(false)}
+                  variant={!importMockData ? 'primary' : 'outline'}
+                  size="small"
+                  style={{ flex: 1 }}
+                />
+              </>
+            ) : (
+              <>
+                <Button
+                  title="Yes, add samples"
+                  onPress={() => setUseTemplates(true)}
+                  variant={useTemplates ? 'primary' : 'outline'}
+                  size="small"
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  title="No, start empty"
+                  onPress={() => setUseTemplates(false)}
+                  variant={!useTemplates ? 'primary' : 'outline'}
+                  size="small"
+                  style={{ flex: 1 }}
+                />
+              </>
+            )}
           </View>
         </Card>
 
