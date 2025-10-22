@@ -15,6 +15,7 @@ export class AuthenticationService {
     try {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      console.log('Biometric check - hasHardware:', hasHardware, 'isEnrolled:', isEnrolled);
       return hasHardware && isEnrolled;
     } catch (error) {
       console.error('Error checking biometric availability:', error);

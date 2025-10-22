@@ -33,6 +33,8 @@ export default function SettingsScreen() {
         AuthenticationService.getSettings(),
         AuthenticationService.getAuthState(),
       ]);
+      console.log('Loaded user settings:', userSettings);
+      console.log('Loaded auth state:', auth);
       setSettings(userSettings);
       setAuthState(auth);
     } catch (error) {
@@ -57,29 +59,67 @@ export default function SettingsScreen() {
   };
 
   const handleBiometricToggle = async (value: boolean) => {
+    console.log('Toggle pressed, value:', value);
+    console.log('Current settings:', settings);
+    console.log('Auth state:', authState);
+    
     if (value && !authState?.biometricAvailable) {
-      Alert.alert('Biometric Not Available', 'Biometric authentication is not available on this device.');
-      return;
+      // For testing purposes, allow enabling even when biometrics not available
+      console.log('Biometric not available, but allowing for testing');
+      Alert.alert('Biometric Not Available', 'Biometric authentication is not available on this device, but the setting will be saved for testing purposes.');
     }
 
+    // Immediately update the UI state for responsive feedback
+    console.log('Updating UI state to:', value);
+    setSettings(prev => ({ ...prev, biometricEnabled: value }));
+
     if (value) {
-      // When enabling, prompt for biometric authentication first
-      try {
-        const success = await AuthenticationService.authenticateWithBiometrics();
-        
-        if (success) {
-          await updateSetting('biometricEnabled', true);
-          Alert.alert('Success', 'Biometric authentication has been enabled.');
-        } else {
-          Alert.alert('Authentication Failed', 'Please authenticate to enable biometric login.');
+      // When enabling, try biometric authentication if available
+      if (authState?.biometricAvailable) {
+        try {
+          console.log('Attempting biometric authentication...');
+          const success = await AuthenticationService.authenticateWithBiometrics();
+          console.log('Biometric authentication result:', success);
+          
+          if (success) {
+            await AuthenticationService.updateSettings({ biometricEnabled: true });
+            Alert.alert('Success', 'Biometric authentication has been enabled.');
+          } else {
+            // Revert the UI state if authentication failed
+            console.log('Authentication failed, reverting UI state');
+            setSettings(prev => ({ ...prev, biometricEnabled: false }));
+            Alert.alert('Authentication Failed', 'Please authenticate to enable biometric login.');
+          }
+        } catch (error) {
+          // Revert the UI state if there was an error
+          console.log('Error during authentication, reverting UI state:', error);
+          setSettings(prev => ({ ...prev, biometricEnabled: false }));
+          console.error('Error enabling biometric:', error);
+          Alert.alert('Error', 'Failed to enable biometric authentication.');
         }
-      } catch (error) {
-        console.error('Error enabling biometric:', error);
-        Alert.alert('Error', 'Failed to enable biometric authentication.');
+      } else {
+        // Biometric not available, just save the setting for testing
+        try {
+          await AuthenticationService.updateSettings({ biometricEnabled: true });
+          console.log('Biometric setting saved (testing mode)');
+        } catch (error) {
+          console.log('Error saving biometric setting:', error);
+          setSettings(prev => ({ ...prev, biometricEnabled: false }));
+        }
       }
     } else {
       // When disabling, just update the setting
-      await updateSetting('biometricEnabled', false);
+      try {
+        console.log('Disabling biometric authentication...');
+        await AuthenticationService.updateSettings({ biometricEnabled: false });
+        console.log('Biometric authentication disabled successfully');
+      } catch (error) {
+        // Revert the UI state if there was an error
+        console.log('Error disabling biometric, reverting UI state:', error);
+        setSettings(prev => ({ ...prev, biometricEnabled: true }));
+        console.error('Error disabling biometric:', error);
+        Alert.alert('Error', 'Failed to disable biometric authentication.');
+      }
     }
   };
 
@@ -176,8 +216,11 @@ export default function SettingsScreen() {
             </View>
             <Switch
               value={settings.biometricEnabled}
-              onValueChange={handleBiometricToggle}
-              disabled={!authState?.biometricAvailable}
+              onValueChange={(value) => {
+                console.log('Switch onValueChange called with:', value);
+                handleBiometricToggle(value);
+              }}
+              disabled={false} // Allow testing even when biometrics not available
               trackColor={{ false: COLORS.gray300, true: COLORS.primary + '50' }}
               thumbColor={settings.biometricEnabled ? COLORS.primary : COLORS.gray400}
             />
