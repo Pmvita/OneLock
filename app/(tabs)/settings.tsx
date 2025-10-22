@@ -62,7 +62,25 @@ export default function SettingsScreen() {
       return;
     }
 
-    await updateSetting('biometricEnabled', value);
+    if (value) {
+      // When enabling, prompt for biometric authentication first
+      try {
+        const success = await AuthenticationService.authenticateWithBiometrics();
+        
+        if (success) {
+          await updateSetting('biometricEnabled', true);
+          Alert.alert('Success', 'Biometric authentication has been enabled.');
+        } else {
+          Alert.alert('Authentication Failed', 'Please authenticate to enable biometric login.');
+        }
+      } catch (error) {
+        console.error('Error enabling biometric:', error);
+        Alert.alert('Error', 'Failed to enable biometric authentication.');
+      }
+    } else {
+      // When disabling, just update the setting
+      await updateSetting('biometricEnabled', false);
+    }
   };
 
   const handleAutoLockChange = (minutes: number) => {
