@@ -4,7 +4,7 @@
 
 OneLock is a professional-grade password and credential manager built with React Native, Expo, and TypeScript. It provides secure storage, biometric authentication, and comprehensive password management features with a modern, user-friendly interface.
 
-## Features
+## Features 
 
 ### 🔐 Security Features
 - **Master Password Protection**: Encrypted master password with strength validation
