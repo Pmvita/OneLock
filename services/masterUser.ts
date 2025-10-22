@@ -15,7 +15,7 @@ export class MasterUserService {
   static async isMasterUser(username: string): Promise<boolean> {
     try {
       const config = await this.getMasterUserConfig();
-      return config.username === username;
+      return config.username.toLowerCase() === username.toLowerCase();
     } catch (error) {
       console.error('Error checking master user:', error);
       return false;
@@ -27,13 +27,9 @@ export class MasterUserService {
    */
   static async getMasterUserConfig(): Promise<{ username: string; passwordHash: string; userType: string }> {
     try {
-      // In a real implementation, this would load from a config file
-      // For now, we'll return the hardcoded config
-      return {
-        username: 'pmvita',
-        passwordHash: 'hash_4060406d506c7265657a7931342d6d6f636b2d656e6372797074696f6e2d6b65792d32303234',
-        userType: 'master'
-      };
+      // Load from config file
+      const masterUserConfig = require('@/config/masterUser.json');
+      return masterUserConfig;
     } catch (error) {
       console.error('Error loading master user config:', error);
       throw new Error('Failed to load master user configuration');
@@ -61,7 +57,7 @@ export class MasterUserService {
       const config = await this.getMasterUserConfig();
       
       // Verify this is the master user
-      if (config.username !== username) {
+      if (config.username.toLowerCase() !== username.toLowerCase()) {
         throw new Error('Invalid master user credentials');
       }
 

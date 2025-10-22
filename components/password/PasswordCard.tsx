@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PasswordEntry, PasswordCategory } from '@/types';
-import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS, CATEGORY_COLORS, CATEGORY_ICONS } from '@/constants';
+import { SPACING, BORDER_RADIUS, FONT_SIZES, FONT_WEIGHTS, SHADOWS, CATEGORY_COLORS, CATEGORY_ICONS, COLORS } from '@/constants';
 import { PasswordStrengthChecker } from '@/utils';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -34,7 +34,7 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.white }, style]}
+      style={[styles.card, { backgroundColor: COLORS.white }, style]}
       onPress={onPress}
       activeOpacity={0.7}
     >
@@ -42,10 +42,10 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
         <View style={styles.titleContainer}>
           <View style={[styles.categoryIndicator, { backgroundColor: CATEGORY_COLORS[password.category] }]} />
           <View style={styles.titleTextContainer}>
-            <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>
+            <Text style={[styles.title, { color: COLORS.textPrimary }]} numberOfLines={1}>
               {password.title}
             </Text>
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
+            <Text style={[styles.subtitle, { color: COLORS.textSecondary }]} numberOfLines={1}>
               {password.username || password.email || 'No username'}
             </Text>
           </View>
@@ -58,21 +58,21 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
           <Ionicons
             name={password.isFavorite ? 'heart' : 'heart-outline'}
             size={20}
-            color={password.isFavorite ? colors.error : colors.gray400}
+            color={password.isFavorite ? COLORS.error : COLORS.gray400}
           />
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
         <View style={styles.passwordContainer}>
-          <Text style={[styles.passwordText, { color: colors.textSecondary }]} numberOfLines={1}>
+          <Text style={[styles.passwordText, { color: COLORS.textSecondary }]} numberOfLines={1}>
             {'•'.repeat(Math.min(password.password.length, 20))}
           </Text>
           <View style={[styles.strengthIndicator, { backgroundColor: strengthColor }]} />
         </View>
 
         {password.url && (
-          <Text style={[styles.urlText, { color: colors.textTertiary }]} numberOfLines={1}>
+          <Text style={[styles.urlText, { color: COLORS.textTertiary }]} numberOfLines={1}>
             {password.url}
           </Text>
         )}
@@ -96,14 +96,14 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
             style={styles.actionButton}
             hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           >
-            <Ionicons name="create-outline" size={16} color={colors.gray500} />
+            <Ionicons name="create-outline" size={16} color={COLORS.gray500} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onDeletePress}
             style={styles.actionButton}
             hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           >
-            <Ionicons name="trash-outline" size={16} color={colors.error} />
+            <Ionicons name="trash-outline" size={16} color={COLORS.error} />
           </TouchableOpacity>
         </View>
       </View>
@@ -207,16 +207,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   const { colors } = useTheme();
   return (
     <View style={[styles.emptyState, style]}>
-      <Ionicons name={icon} size={64} color={colors.gray300} />
-      <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{title}</Text>
-      <Text style={[styles.emptyDescription, { color: colors.textSecondary }]}>{description}</Text>
+      <Ionicons name={icon} size={64} color={COLORS.gray300} />
+      <Text style={[styles.emptyTitle, { color: COLORS.textPrimary }]}>{title}</Text>
+      <Text style={[styles.emptyDescription, { color: COLORS.textSecondary }]}>{description}</Text>
       {actionTitle && onActionPress && (
         <TouchableOpacity
-          style={[styles.emptyAction, { backgroundColor: colors.primary }]}
+          style={[styles.emptyAction, { backgroundColor: COLORS.primary }]}
           onPress={onActionPress}
           activeOpacity={0.7}
         >
-          <Text style={[styles.emptyActionText, { color: colors.white }]}>{actionTitle}</Text>
+          <Text style={[styles.emptyActionText, { color: COLORS.white }]}>{actionTitle}</Text>
         </TouchableOpacity>
       )}
     </View>
